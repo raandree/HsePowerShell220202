@@ -2,6 +2,13 @@
 
 ## Useful Links
 - Create a lab environment with PowerShell: [AutomatedLab](https://automatedlab.org/en/latest/)
+- [Regex101 builder](https://regex101.com/). If you need to parse complex text, RegEx is your friend.
+
+## PowerShell Cheat Sheets
+  - https://cdn.comparitech.com/wp-content/uploads/2018/08/Comparitech-Powershell-cheatsheet.pdf
+  - https://ramblingcookiemonster.github.io/images/Cheat-Sheets/powershell-basic-cheat-sheet2.pdf
+  - https://gitlab.com/JamesHedges/notes/-/wikis/Powershell/PowerShell-Cheat-Sheet
+  - https://www.theochem.ru.nl/~pwormer/teachmat/PS_cheat_sheet.html
 
 
 ## Code Snippets
