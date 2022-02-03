@@ -115,7 +115,7 @@
     $users = Get-ADUser -Filter * -Properties Country | Group-Object -Property Country | Sort-Object -Property Name
     ```
 
-- Import and Export CSV and XML by using processes
+- ### Import and Export CSV and XML by using processes
 
     ```powershell
     Get-Process | Select-Object -Property Name, ID, Threads, StartInfo | Export-Csv -Path p.csv -NoTypeInformation
@@ -133,19 +133,19 @@
     $p[0].StartInfo
     ```
 
-- Get the PSReadline History in Notepad
+- ### Get the PSReadline History in Notepad
     ```powershell
     notepad (Get-PSReadLineOption).HistorySavePath
     ```
 
-- Use `Out-GridView` to allow someone to select processes that will be stopped
+- ### Use `Out-GridView` to allow someone to select processes that will be stopped
     ```powershell
     Get-Process | Out-GridView                          
     Get-Process | Out-GridView -PassThru                
     Get-Process | Out-GridView -PassThru | Stop-Process 
     ```
 
-- Get Logon Events from the Security Event Log
+- ### Get Logon Events from the Security Event Log
 
     Get all logon events for the user `someone` that have been generated after 18:00 today
 
@@ -165,4 +165,19 @@
     @{ Name = 'Username'; Expression = { $_.ReplacementStrings[5] } }, 
     @{ Name = 'AuthType'; Expression = { $_.ReplacementStrings[10] } }, 
     @{ Name = 'Domain'; Expression = { $_.ReplacementStrings[6] } }
+    ```
+
+- ### Check the status of a service and start it when stopped.
+
+    ```powershell
+    $serviceName = 'W32Time'
+    $s = Get-Service -Name $serviceName
+    if ($s.Status -ne 'Running') {
+        Write-Host "Service '$serviceName' is not running, starting it..." -NoNewline
+        Start-Service -Name $serviceName
+        Write-Host 'done'
+    }
+    else {
+        Write-Host "Service '$serviceName' is already running"
+    }
     ```
