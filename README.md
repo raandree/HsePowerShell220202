@@ -13,7 +13,7 @@
 
 ## Code Snippets
 
-- Get all outlook events from the application event log (local machine)
+- ### Get all outlook events from the application event log (local machine)
 
     ```powershell
     Get-EventLog -LogName Application -EntryType Error, Warning -Source Outlook
@@ -31,7 +31,7 @@
     Get-EventLog -LogName Application -EntryType Error, Warning -Source Outlook -After (Get-Date).AddHours(-2)
     ```
 
-- Simpler Error Handling
+- ### Simpler Error Handling
 
     Get all files and folders, don't show the errors in the console but save them in the variable `$myError`.
 
@@ -44,7 +44,7 @@
     $myError.TargetObject
     ```
 
-- DateTime Object
+- ### DateTime Object
     ```powershell
     $d = Get-Date
     $d.Ticks    
@@ -58,3 +58,92 @@
     $nextYear = Get-Date -Date '1. 1. 2023'
     $nextYear - $d
     ```
+
+- ### Find all files that have been changed in a certain time frame
+
+    ```powershell
+    $start = Get-Date -Date '2.2.2022 08:00:00'
+    $end = Get-Date -Date '2.2.2022 13:00:00'
+
+    dir d:\ -Recurse | Where-Object { $_.LastWriteTime -gt $start -and $_.LastWriteTime -lt $end }
+    ```
+
+- ### Get all text files that contain the string `a877777`.
+    ```powershell
+    dir -Path E:\LabSources -Filter *.txt -Recurse |
+        Where-Object {
+            Get-Content -Path $_.FullName | Where-Object { $_ -like '*a877777*'
+        }
+    }
+    ```
+
+- ### Group all files by the year of their creation
+    ```powershell
+    dir -Recurse | Group-Object -Property { $_.CreationTime.ToString('yyyy') }
+    ```
+    ```
+    Count Name                      Group                                                                        
+    ----- ----                      -----                                                                        
+    1244 2021                      {CustomRoles, DscConfigurations, GitRepositories, ISOs...}                   
+    170 2022                      {HostStart.ps1, AssemblyInfo.cs, ExchangeServer2016-x64-CU20.ISO, Exchange...
+    44 2020                      {en_sql_server_2012_standard_edition_with_service_pack_4_x64_dvd_100075944...
+   ```
+
+   - ### `Where-Object` and `Group-Object` with Active Directory
+    ```powershell
+    #Get all users working in Bolivia by filtering them
+
+    #Get one object first to get an idea how it looks like and where the information about
+    #the country is actually stored
+    Get-ADUser -Identity a174978 -Properties *
+
+    #you will see it is in the property 'c' or 'country' and not like you may think in the
+    #property 'country/region' as displayed in dsa.msc. You also realize that the country
+    #AD is stored as the country code (BO) and not the countrie's display name (Bolivia)
+
+    $users = Get-ADUser -Filter * -Properties Country | Where-Object Country -eq BO
+    $users.Count
+
+    #Filtering should be always done - if possible - on the system that creates the data
+    #snapshot / stores the data.
+    $users = Get-ADUser -Filter { Country -eq "BO" }
+    $users.Count
+
+    #It could be also interesting to get all users and group them by the country. Then you
+    #get not only the employee count of Bolivia but every country that is represented in AD.
+    $users = Get-ADUser -Filter * -Properties Country | Group-Object -Property Country | Sort-Object -Property Name
+    ```
+
+- Import and Export CSV and XML by using processes
+
+    ```powershell
+    Get-Process | Select-Object -Property Name, ID, Threads, StartInfo | Export-Csv -Path p.csv -NoTypeInformation
+    start .\p.csv
+    $p = Import-Csv -Path D:\p.csv
+    $p[0].Threads #returns just 'System.Diagnostics.ProcessThreadCollection'
+
+    Get-Process | Select-Object -Property Name, ID, Threads, StartInfo | Export-Clixml -Path p.xml
+    dir #the XML file is much larger then CSV
+    $p = Import-Clixml D:\p.xml
+    #this time we can access all data and the other dimensions are preserved.
+    $p[0]
+    $p[0].Threads.Count
+    $p[0].Threads
+    $p[0].StartInfo
+    ```
+
+- Get the PSReadline History in Notepad
+    ```powershell
+    notepad (Get-PSReadLineOption).HistorySavePath
+    ```
+
+- Use `Out-GridView` to allow someone to select processes that will be stopped
+    ```powershell
+    Get-Process | Out-GridView                          
+    Get-Process | Out-GridView -PassThru                
+    Get-Process | Out-GridView -PassThru | Stop-Process 
+    ```
+
+
+TODO
+    Get-EventLog -LogName Security -InstanceId 4624 | Where-Object { $_.ReplacementStrings[5] -eq 'randr' }
