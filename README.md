@@ -158,5 +158,11 @@
     This time we are getting the events from yesterday (`.AddDays(-1)`).
 
     ```powershell
-    Get-EventLog -LogName Security -InstanceId 4624 | Where-Object { $_.TimeGenerated -gt (Get-Date -Hour 18 -Minute 0 -Second 0).AddDays(-1) } | Format-Table -Property TimeGenerated, @{ Name = 'Username'; Expression = { $_.ReplacementStrings[5] } }, @{ Name = 'AuthType'; Expression = { $_.ReplacementStrings[10] } }, @{ Name = 'Domain'; Expression = { $_.ReplacementStrings[6] } }
+    Get-EventLog -LogName Security -InstanceId 4624 |
+    Where-Object {
+    $_.TimeGenerated -gt (Get-Date -Hour 18 -Minute 0 -Second 0).AddDays(-1) } | 
+    Format-Table -Property TimeGenerated,
+    @{ Name = 'Username'; Expression = { $_.ReplacementStrings[5] } }, 
+    @{ Name = 'AuthType'; Expression = { $_.ReplacementStrings[10] } }, 
+    @{ Name = 'Domain'; Expression = { $_.ReplacementStrings[6] } }
     ```
