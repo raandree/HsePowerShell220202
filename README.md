@@ -3,6 +3,7 @@
 ## Useful Links
 - Create a lab environment with PowerShell: [AutomatedLab](https://automatedlab.org/en/latest/)
 - [Regex101 builder](https://regex101.com/). If you need to parse complex text, RegEx is your friend.
+- [From a one-liner to a full-featured PowerShell advanced function](https://github.com/raandree/PowerShellTraining). Recommended if you want to learn all the features PowerShell provide to organize code in function.
 
 ## PowerShell Cheat Sheets
   - https://cdn.comparitech.com/wp-content/uploads/2018/08/Comparitech-Powershell-cheatsheet.pdf
@@ -144,6 +145,18 @@
     Get-Process | Out-GridView -PassThru | Stop-Process 
     ```
 
+- Get Logon Events from the Security Event Log
 
-TODO
-    Get-EventLog -LogName Security -InstanceId 4624 | Where-Object { $_.ReplacementStrings[5] -eq 'randr' }
+    Get all logon events for the user `someone` that have been generated after 18:00 today
+
+    ```powershell
+    Get-EventLog -LogName Security -InstanceId 4624 | Where-Object { $_.ReplacementStrings[5] -eq 'someone' -and $_.TimeGenerated -gt (Get-Date -Hour 18 -Minute 0 -Second 0).AddDays(-1) }
+    ```
+
+    Same thing but this command uses dynamic columns to represent the data in a better way.
+
+    This time we are getting the events from yesterday (`.AddDays(-1)`).
+
+    ```powershell
+    Get-EventLog -LogName Security -InstanceId 4624 | Where-Object { $_.TimeGenerated -gt (Get-Date -Hour 18 -Minute 0 -Second 0).AddDays(-1) } | Format-Table -Property TimeGenerated, @{ Name = 'Username'; Expression = { $_.ReplacementStrings[5] } }, @{ Name = 'AuthType'; Expression = { $_.ReplacementStrings[10] } }, @{ Name = 'Domain'; Expression = { $_.ReplacementStrings[6] } }
+    ```
