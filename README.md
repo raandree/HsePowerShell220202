@@ -181,3 +181,48 @@
         Write-Host "Service '$serviceName' is already running"
     }
     ```
+
+- Look for a certain pattern in a text file and print out all lines matching that pattern including the line number. Also each match gets a context added so you can access the two previous and following lines.
+
+    ```powershell
+    $content = Get-Content -Path C:\Windows\debug\WIA\wiatrace.log | Select-String -Pattern 'An error occured' -Context 2, 2
+    $content | Format-Table -Property LineNumber, @{ Name = 'LineContent'; Expression = { $_ } }
+    $content[6].Context.PreContext
+    $content[6].Context.PostContext
+    ```
+
+- ### ForEach samples 
+    - Start all VMs that are not already running yet.
+
+        ```powershell
+        $vms = Get-VM -Name DSC*
+
+        $vms | ForEach-Object {
+            if ($_.State -ne 'Running') {
+                Write-Host "Starting VM $($_.Name)..." -NoNewline
+                $_ | Start-VM
+                Write-Host 'done'
+            }
+            else {
+                Write-Host "VM $($_.Name) is already started"
+            }
+        }
+        ```
+
+    - Create 100 test users in Active Directory
+
+    > Note: The `f` operator allows some special formatting, in this case the expanding of the integer to 3 digits.
+
+    ```powershell
+    1..100 | ForEach-Object {
+        $name = "TestUser {0:D3}" -f $_
+        New-ADUser -Name $name -Path 'OU=Demo2,DC=contoso,DC=com'
+    }
+    ```
+
+    - You don't necessarily need a ForEach loop in PowerShell to process a number of elements as the pipe (`|`) is implements a ForEach loop.
+
+    ```powershell
+    $users = Get-ADUser -Filter * -SearchBase 'OU=Demo2,DC=contoso,DC=com'
+    $users | Set-ADUser -Description 'Test User'
+    ```
