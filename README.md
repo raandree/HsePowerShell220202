@@ -432,3 +432,30 @@
 
     Invoke-Command -ComputerName $computers.DnsHostName -ScriptBlock $command
     ```
+
+&nbsp;
+
+- ### Different kind of loops
+
+    ```powershell
+    $a = 1..5
+
+    $a | ForEach-Object {
+        "Test $_"
+    }
+
+    foreach ($value in $a) {
+        "Test $value"
+    }
+
+    for ($i = 0; $i -lt $a.Length; $i++) {
+        "Test $($a[$i])"
+    }
+
+    Write-Host "Waiting for file 'D:\Untitled6.ps1' to be present'" -NoNewline
+    do {
+        Start-Sleep -Milliseconds 500
+        Write-Host . -NoNewline
+    } until (Test-Path D:\Untitled6.ps1)
+    Write-Host "File found"
+    ```
