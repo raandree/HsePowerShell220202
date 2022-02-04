@@ -1,0 +1,2 @@
+# Ensure any exe files are treated as binary
+*.zip binary
