@@ -209,20 +209,84 @@
         }
         ```
 
-    - Create 100 test users in Active Directory
+        - Create 100 test users in Active Directory
 
-    > Note: The `f` operator allows some special formatting, in this case the expanding of the integer to 3 digits.
+        > Note: The `f` operator allows some special formatting, in this case the expanding of the integer to 3 digits.
+
+        ```powershell
+        1..100 | ForEach-Object {
+            $name = "TestUser {0:D3}" -f $_
+            New-ADUser -Name $name -Path 'OU=Demo2,DC=contoso,DC=com'
+        }
+        ```
+
+        - You don't necessarily need a ForEach loop in PowerShell to process a number of elements as the pipe (`|`) is implements a ForEach loop.
+
+        ```powershell
+        $users = Get-ADUser -Filter * -SearchBase 'OU=Demo2,DC=contoso,DC=com'
+        $users | Set-ADUser -Description 'Test User'
+        ```
+    
+        - You can use the `ForEach-Object` cmdlet or the `foreach` keyword to create data in Active Directory but many cmdlets accept pipeline input by property name (ValueFromPipelineByPropertyName), hence a foreach loop is not required
+
+        ```powershell
+        Import-Module ActiveDirectory
+        
+        $Domain="@abc.com"
+        $UserOu="OU=Users,DC=abc,DC=com"
+        $NewUsersList=Import-CSV "D:\userstobeimported.csv"
+        
+        ForEach ($User in $NewUsersList) 
+        {
+            $givenName=$User.givenName
+            $sAMAccountName=$User.sAMAccountName
+            $userPrincipalName=$User.sAMAccountName+$Domain
+            $userPassword=$User.Password
+            $expire=$null
+
+            New-ADUser -Name $givenName -GivenName $givenName  -SamAccountName $sAMAccountName 
+        }
+        ```
+
+        Using the PowerShell pipeline feature `ValueFromPipelineByPropertyName` shortens the script to just one line (two lines if you want to create an OU as well).
+
+        ```powershell
+        $ou = New-ADOrganizationalUnit -Name Demo1 -PassThru
+        Import-Csv -Path .\People.csv -Delimiter ';' | New-ADUser -Path $ou
+        ```
+
+        Removing the users works like this:
+
+        ```powershell
+        Get-ADUser -Filter 'Description -like "Class*"' | Remove-ADUser -Confirm:$false
+        ```
+    
+    - ### Use the `split` and `join` operator to bring list into a new format
 
     ```powershell
-    1..100 | ForEach-Object {
-        $name = "TestUser {0:D3}" -f $_
-        New-ADUser -Name $name -Path 'OU=Demo2,DC=contoso,DC=com'
-    }
+    $emails = 'Hall.Nichols@contoso.com, Hoyt.Cortez@contoso.com, Adrienne.Bean@contoso.com, Oliver.Cote@contoso.com, Sasha.Glenn@contoso.com, Wing.Foreman@contoso.com, Phillip.Joyner@contoso.com, Miranda.Espinoza@contoso.com, Brody.Shelton@contoso.com, Reece.Joseph@contoso.com'
+    $emails = $emails -split ',' | ForEach-Object { $_.Trim() }
+    '"' + ($emails -join '"; "') + '"'
     ```
 
-    - You don't necessarily need a ForEach loop in PowerShell to process a number of elements as the pipe (`|`) is implements a ForEach loop.
+- Arrays are immutable types meaning they cannot be extended in length. The `+=` operator makes it look like it is possible but PowerShell copies the growing data as often in memory as you add something to the list. This can take hours. A very fast alternative is using an `System.Collections.ArrayList`.
 
     ```powershell
-    $users = Get-ADUser -Filter * -SearchBase 'OU=Demo2,DC=contoso,DC=com'
-    $users | Set-ADUser -Description 'Test User'
+    $files = @()
+
+    1..100000 | ForEach-Object {
+        $files += "New File $_"
+    }
+
+    $files.Count
+
+    #----------------------------------------
+
+    $al = New-Object System.Collections.ArrayList
+
+    1..100000 | ForEach-Object {
+        $null = $al.Add("New File $_") #| Out-Null
+    }
+
+    $al.Count
     ```
