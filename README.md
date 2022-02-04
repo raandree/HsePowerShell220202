@@ -4,6 +4,8 @@
 - Create a lab environment with PowerShell: [AutomatedLab](https://automatedlab.org/en/latest/)
 - [Regex101 builder](https://regex101.com/). If you need to parse complex text, RegEx is your friend.
 - [From a one-liner to a full-featured PowerShell advanced function](https://github.com/raandree/PowerShellTraining). Recommended if you want to learn all the features PowerShell provide to organize code in function.
+- [PowerShell Explained with Kevin Marquette
+](https://powershellexplained.com/sitemap/?utm_source=blog&utm_medium=blog&utm_content=recent)
 
 ## PowerShell Cheat Sheets
   - https://cdn.comparitech.com/wp-content/uploads/2018/08/Comparitech-Powershell-cheatsheet.pdf
@@ -289,4 +291,102 @@
     }
 
     $al.Count
+    ```
+
+- ### Hashtables: Store data about computers in a hashtable, then export and import it via JSON.
+
+    ```powershell
+    $memory1 = 2gb
+    $disk1 = '1TB SSD'
+    $cpu1 = 'i7'
+    $name1 = 'My Computer'
+    $assetTag1 = 12334
+
+    $memory2 = 2gb
+    $disk2 = '1TB SSD'
+    $cpu2 = 'i7'
+    $name2 = 'My Computer'
+    $assetTag2 = 12334
+
+    $computers = @{
+        Name = 'Office Machine 1'
+        Memory = 8GB
+        CPU = 'Intel i7'
+        AssetTag = 'x123'
+        Disks = @{
+            Type = 'SSD'
+            Size = 1TB
+        },
+        @{
+            Type = 'HDD'
+            Size = 12TB
+        }
+    },
+    @{
+        Name = 'Office Machine 2'
+        Memory = 16GB
+        CPU = 'Intel i97'
+        AssetTag = 'x123'
+        Disks = @{
+            Type = 'SSD'
+            Size = 41TB
+        },
+        @{
+            Type = 'HDD'
+            Size = 12TB
+        },
+        @{
+            Type = 'HDD'
+            Size = 12TB
+        }
+    }
+
+    #get the size of the first disk of the first computer
+    $computers[0].Disks[0].Size
+
+    #remove disk 3 from computer 1
+    $computers[1].Disks = $computers[1].Disks[0, 1]
+    $computers[1].Disks.Count
+
+    $computers | ConvertTo-Json | Out-File -FilePath D:\Computers.json
+
+    $computers = Get-Content -Path D:\Computers.json -Raw | ConvertFrom-Json
+    ```
+
+- ### Find duplicate files by comparing the hash created by the file content using `Get-FileHash`
+
+    ```powershell
+    dir -Recurse | Group-Object -Property { ($_ | Get-FileHash).Hash } | Where-Object Count -gt 1
+    ```
+
+- ### Remoting
+
+    - Ininstall and install Notepad++ on all machines in a certain OU.
+
+    Some more details about remote software installation with PowerShell:
+        - [Working with Software Installations](https://docs.microsoft.com/en-us/powershell/scripting/samples/working-with-software-installations?view=powershell-7.2)
+        - [**Powershell: Remote install software**](https://powershellexplained.com/2017-04-22-Powershell-installing-remote-software/)
+
+    ```powershell
+        $command = {
+        if (Test-Path -Path 'C:\Program Files\Notepad++\notepad++.exe')
+        {
+            Write-Host 'Notpad+ is installed and will be uninstalled...' -NoNewline
+            $p = Start-Process -FilePath 'C:\Program Files\Notepad++\uninstall.exe' -ArgumentList /S -PassThru
+            $p.WaitForExit()
+            Write-Host done
+        }
+        else
+        {
+            Write-Host 'Notpad+ is not installed'
+        }
+
+        Write-Host 'Installing Notepad++...' -NoNewline
+        $p = Start-Process -FilePath C:\npp.8.1.9.Installer.x64.exe -ArgumentList /S -PassThru
+        $p.WaitForExit()
+        Write-Host done
+    }
+    $computers = Get-ADComputer -Filter * -SearchBase 'CN=Computers,DC=contoso,DC=com'
+
+    Invoke-Command -ComputerName $computers.DnsHostName -ScriptBlock $command
     ```
