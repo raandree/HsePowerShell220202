@@ -7,12 +7,15 @@
 - [PowerShell Explained with Kevin Marquette
 ](https://powershellexplained.com/sitemap/?utm_source=blog&utm_medium=blog&utm_content=recent)
 
+&nbsp;
+
 ## PowerShell Cheat Sheets
   - https://cdn.comparitech.com/wp-content/uploads/2018/08/Comparitech-Powershell-cheatsheet.pdf
   - https://ramblingcookiemonster.github.io/images/Cheat-Sheets/powershell-basic-cheat-sheet2.pdf
   - https://gitlab.com/JamesHedges/notes/-/wikis/Powershell/PowerShell-Cheat-Sheet
   - https://www.theochem.ru.nl/~pwormer/teachmat/PS_cheat_sheet.html
 
+&nbsp;
 
 ## Code Snippets
 
@@ -33,6 +36,7 @@
     ```powershell
     Get-EventLog -LogName Application -EntryType Error, Warning -Source Outlook -After (Get-Date).AddHours(-2)
     ```
+&nbsp;
 
 - ### Simpler Error Handling
 
@@ -46,6 +50,8 @@
     #This line returns all files and folders that could not be read
     $myError.TargetObject
     ```
+
+&nbsp;
 
 - ### DateTime Object
     ```powershell
@@ -62,6 +68,8 @@
     $nextYear - $d
     ```
 
+&nbsp;
+
 - ### Find all files that have been changed in a certain time frame
 
     ```powershell
@@ -71,6 +79,8 @@
     dir d:\ -Recurse | Where-Object { $_.LastWriteTime -gt $start -and $_.LastWriteTime -lt $end }
     ```
 
+&nbsp;
+
 - ### Get all text files that contain the string `a877777`.
     ```powershell
     dir -Path E:\LabSources -Filter *.txt -Recurse |
@@ -79,6 +89,8 @@
         }
     }
     ```
+
+&nbsp;
 
 - ### Group all files by the year of their creation
     ```powershell
@@ -92,6 +104,8 @@
     44 2020                      {en_sql_server_2012_standard_edition_with_service_pack_4_x64_dvd_100075944...
    ```
 
+    &nbsp;
+
    - ### `Where-Object` and `Group-Object` with Active Directory
     ```powershell
     #Get all users working in Bolivia by filtering them
@@ -102,7 +116,7 @@
 
     #you will see it is in the property 'c' or 'country' and not like you may think in the
     #property 'country/region' as displayed in dsa.msc. You also realize that the country
-    #AD is stored as the country code (BO) and not the countrie's display name (Bolivia)
+    #AD is stored as the country code (BO) and not the country's display name (Bolivia)
 
     $users = Get-ADUser -Filter * -Properties Country | Where-Object Country -eq BO
     $users.Count
@@ -116,6 +130,8 @@
     #get not only the employee count of Bolivia but every country that is represented in AD.
     $users = Get-ADUser -Filter * -Properties Country | Group-Object -Property Country | Sort-Object -Property Name
     ```
+
+&nbsp;
 
 - ### Import and Export CSV and XML by using processes
 
@@ -135,10 +151,14 @@
     $p[0].StartInfo
     ```
 
+&nbsp;
+
 - ### Get the PSReadline History in Notepad
     ```powershell
     notepad (Get-PSReadLineOption).HistorySavePath
     ```
+
+&nbsp;
 
 - ### Use `Out-GridView` to allow someone to select processes that will be stopped
     ```powershell
@@ -146,6 +166,8 @@
     Get-Process | Out-GridView -PassThru                
     Get-Process | Out-GridView -PassThru | Stop-Process 
     ```
+
+&nbsp;
 
 - ### Get Logon Events from the Security Event Log
 
@@ -168,6 +190,8 @@
     @{ Name = 'AuthType'; Expression = { $_.ReplacementStrings[10] } }, 
     @{ Name = 'Domain'; Expression = { $_.ReplacementStrings[6] } }
     ```
+
+&nbsp;
 
 - ### Check the status of a service and start it when stopped.
 
@@ -193,6 +217,8 @@
     $content[6].Context.PostContext
     ```
 
+&nbsp;
+
 - ### ForEach samples 
     - Start all VMs that are not already running yet.
 
@@ -211,7 +237,9 @@
         }
         ```
 
-        - Create 100 test users in Active Directory
+        &nbsp;
+
+    - Create 100 test users in Active Directory
 
         > Note: The `f` operator allows some special formatting, in this case the expanding of the integer to 3 digits.
 
@@ -222,14 +250,18 @@
         }
         ```
 
-        - You don't necessarily need a ForEach loop in PowerShell to process a number of elements as the pipe (`|`) is implements a ForEach loop.
+        &nbsp;
+
+    - You don't necessarily need a ForEach loop in PowerShell to process a number of elements as the pipe (`|`) is implements a ForEach loop.
 
         ```powershell
         $users = Get-ADUser -Filter * -SearchBase 'OU=Demo2,DC=contoso,DC=com'
         $users | Set-ADUser -Description 'Test User'
         ```
-    
-        - You can use the `ForEach-Object` cmdlet or the `foreach` keyword to create data in Active Directory but many cmdlets accept pipeline input by property name (ValueFromPipelineByPropertyName), hence a foreach loop is not required
+
+    &nbsp;
+
+    - You can use the `ForEach-Object` cmdlet or the `foreach` keyword to create data in Active Directory but many cmdlets accept pipeline input by property name (ValueFromPipelineByPropertyName), hence a foreach loop is not required
 
         ```powershell
         Import-Module ActiveDirectory
@@ -262,16 +294,19 @@
         ```powershell
         Get-ADUser -Filter 'Description -like "Class*"' | Remove-ADUser -Confirm:$false
         ```
-    
+
+    &nbsp;
+
     - ### Use the `split` and `join` operator to bring list into a new format
 
-    ```powershell
-    $emails = 'Hall.Nichols@contoso.com, Hoyt.Cortez@contoso.com, Adrienne.Bean@contoso.com, Oliver.Cote@contoso.com, Sasha.Glenn@contoso.com, Wing.Foreman@contoso.com, Phillip.Joyner@contoso.com, Miranda.Espinoza@contoso.com, Brody.Shelton@contoso.com, Reece.Joseph@contoso.com'
-    $emails = $emails -split ',' | ForEach-Object { $_.Trim() }
-    '"' + ($emails -join '"; "') + '"'
-    ```
+        ```powershell
+        $emails = 'Hall.Nichols@contoso.com, Hoyt.Cortez@contoso.com, Adrienne.Bean@contoso.com, Oliver.Cote@contoso.com, Sasha.Glenn@contoso.com, Wing.Foreman@contoso.com, Phillip.Joyner@contoso.com, Miranda.Espinoza@contoso.com, Brody.Shelton@contoso.com, Reece.Joseph@contoso.com'
+        $emails = $emails -split ',' | ForEach-Object { $_.Trim() }
+        '"' + ($emails -join '"; "') + '"'
+        ```
 
-- Arrays are immutable types meaning they cannot be extended in length. The `+=` operator makes it look like it is possible but PowerShell copies the growing data as often in memory as you add something to the list. This can take hours. A very fast alternative is using an `System.Collections.ArrayList`.
+- ### Arrays are immutable types meaning they cannot be extended in length. The `+=` operator makes it look like it is possible but PowerShell copies the growing data as often in memory as you add something to the list. This can take hours. A very fast alternative is using an `System.Collections.ArrayList`.
+    &nbsp;
 
     ```powershell
     $files = @()
@@ -293,7 +328,10 @@
     $al.Count
     ```
 
+&nbsp;
+
 - ### Hashtables: Store data about computers in a hashtable, then export and import it via JSON.
+    &nbsp;
 
     ```powershell
     $memory1 = 2gb
@@ -353,19 +391,23 @@
     $computers = Get-Content -Path D:\Computers.json -Raw | ConvertFrom-Json
     ```
 
+&nbsp;
+
 - ### Find duplicate files by comparing the hash created by the file content using `Get-FileHash`
 
     ```powershell
     dir -Recurse | Group-Object -Property { ($_ | Get-FileHash).Hash } | Where-Object Count -gt 1
     ```
 
-- ### Remoting
+&nbsp;
 
-    - Ininstall and install Notepad++ on all machines in a certain OU.
+- ### Remoting: Uninstall and install Notepad++ on all machines in a certain OU.
 
     Some more details about remote software installation with PowerShell:
-        - [Working with Software Installations](https://docs.microsoft.com/en-us/powershell/scripting/samples/working-with-software-installations?view=powershell-7.2)
-        - [**Powershell: Remote install software**](https://powershellexplained.com/2017-04-22-Powershell-installing-remote-software/)
+    - [Working with Software Installations](https://docs.microsoft.com/en-us/powershell/scripting/samples/working-with-software-installations?view=powershell-7.2)
+    - [**Powershell: Remote install software**](https://powershellexplained.com/2017-04-22-Powershell-installing-remote-software/)
+
+    &nbsp;
 
     ```powershell
         $command = {
